@@ -1,4 +1,4 @@
-from .analyze import analyze
+from .analyze import analyze, simple_load, simple_analyze
 from .visualize import visualize
 from .sonify import sonify
 from .typings import AnalysisResult
