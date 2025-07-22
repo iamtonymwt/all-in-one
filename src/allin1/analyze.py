@@ -37,7 +37,7 @@ def simple_analyze(path, model, device='cuda'):
   demix_path = demix([path], demix_dir, device)[0]
 
   # Extract spectrograms
-  spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=True)[0]
+  spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=False)[0]
 
   # Run inference
   with torch.no_grad():
