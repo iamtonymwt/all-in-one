@@ -1,5 +1,5 @@
 import torch
-
+import shutil
 from typing import List, Union
 from tqdm import tqdm
 from pathlib import Path
@@ -50,16 +50,15 @@ def simple_analyze(path, model, device='cuda'):
           include_embeddings=False,
       )
 
-  # Clean up
-  for stem in ['bass', 'drums', 'other', 'vocals']:
-      (demix_path / f'{stem}.wav').unlink(missing_ok=True)
-  rmdir_if_empty(demix_path)
-  rmdir_if_empty(demix_dir / 'htdemucs')
-  rmdir_if_empty(demix_dir)
+  # Clean up: delete entire demix folder
+  if demix_dir.exists():
+      shutil.rmtree(demix_dir, ignore_errors=True)
+      print(f"Removed demix folder: {demix_dir}")
 
-  # Remove spectrogram
-  spec_path.unlink(missing_ok=True)
-  rmdir_if_empty(spec_dir)
+  # Clean up: delete entire spec folder
+  if spec_dir.exists():
+      shutil.rmtree(spec_dir, ignore_errors=True)
+      print(f"Removed spec folder: {spec_dir}")
 
   return result
 
