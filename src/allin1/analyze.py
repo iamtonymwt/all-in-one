@@ -37,7 +37,7 @@ def simple_analyze(path, model, device='cuda'):
   demix_path = demix([path], demix_dir, device)[0]
 
   # Extract spectrograms
-  spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=False)[0]
+  spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=True)[0]
 
   # Run inference
   with torch.no_grad():
@@ -50,16 +50,16 @@ def simple_analyze(path, model, device='cuda'):
           include_embeddings=False,
       )
 
-  # # Clean up
-  # for stem in ['bass', 'drums', 'other', 'vocals']:
-  #     (demix_path / f'{stem}.wav').unlink(missing_ok=True)
-  # rmdir_if_empty(demix_path)
-  # rmdir_if_empty(demix_dir / 'htdemucs')
-  # rmdir_if_empty(demix_dir)
+  # Clean up
+  for stem in ['bass', 'drums', 'other', 'vocals']:
+      (demix_path / f'{stem}.wav').unlink(missing_ok=True)
+  rmdir_if_empty(demix_path)
+  rmdir_if_empty(demix_dir / 'htdemucs')
+  rmdir_if_empty(demix_dir)
 
-  # # Remove spectrogram
-  # spec_path.unlink(missing_ok=True)
-  # rmdir_if_empty(spec_dir)
+  # Remove spectrogram
+  spec_path.unlink(missing_ok=True)
+  rmdir_if_empty(spec_dir)
 
   return result
 
