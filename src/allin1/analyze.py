@@ -27,10 +27,11 @@ def simple_load(model='harmonix-all', device='cuda'):
 def simple_analyze(path, model, device='cuda'):
   path = Path(path)
   if not path.exists():
-      raise FileNotFoundError(f"Audio file not found.")
+      raise FileNotFoundError("Audio file not found.")
 
-  demix_dir = mkpath('./demix')
-  spec_dir = mkpath('./spec')
+  base_name = path.stem
+  demix_dir = mkpath(f'./demix_{base_name}')
+  spec_dir = mkpath(f'./spec_{base_name}')
 
   # Demix
   demix_path = demix([path], demix_dir, device)[0]
@@ -38,7 +39,6 @@ def simple_analyze(path, model, device='cuda'):
   # Extract spectrograms
   spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=False)[0]
 
-  
   # Run inference
   with torch.no_grad():
       result = run_inference(
@@ -50,16 +50,16 @@ def simple_analyze(path, model, device='cuda'):
           include_embeddings=False,
       )
 
-  # Clean up
-  for stem in ['bass', 'drums', 'other', 'vocals']:
-      (demix_path / f'{stem}.wav').unlink(missing_ok=True)
-  rmdir_if_empty(demix_path)
-  rmdir_if_empty(demix_dir / 'htdemucs')
-  rmdir_if_empty(demix_dir)
+  # # Clean up
+  # for stem in ['bass', 'drums', 'other', 'vocals']:
+  #     (demix_path / f'{stem}.wav').unlink(missing_ok=True)
+  # rmdir_if_empty(demix_path)
+  # rmdir_if_empty(demix_dir / 'htdemucs')
+  # rmdir_if_empty(demix_dir)
 
-  # Remove spectrogram
-  spec_path.unlink(missing_ok=True)
-  rmdir_if_empty(spec_dir)
+  # # Remove spectrogram
+  # spec_path.unlink(missing_ok=True)
+  # rmdir_if_empty(spec_dir)
 
   return result
 
