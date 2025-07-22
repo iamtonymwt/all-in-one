@@ -2,6 +2,7 @@ import torch
 
 from typing import List, Union
 from tqdm import tqdm
+from pathlib import Path
 from .demix import demix
 from .spectrogram import extract_spectrograms
 from .models import load_pretrained_model
@@ -24,6 +25,7 @@ def simple_load(model='harmonix-all', device='cuda'):
 
 
 def simple_analyze(path, model, device='cuda'):
+  path = Path(path)
   if not path.exists():
       raise FileNotFoundError(f"Audio file not found.")
 
@@ -55,6 +57,7 @@ def simple_analyze(path, model, device='cuda'):
   rmdir_if_empty(demix_dir / 'htdemucs')
   rmdir_if_empty(demix_dir)
 
+  # Remove spectrogram
   spec_path.unlink(missing_ok=True)
   rmdir_if_empty(spec_dir)
 
