@@ -18,6 +18,49 @@ from .utils import mkpath, load_result
 from .typings import AnalysisResult, PathLike
 
 
+def simple_load(model='harmonix-all', device='cuda'):
+  model = load_pretrained_model('harmonix-all', device=device)
+  return model
+
+
+def simple_analyze(path, model, device='cuda'):
+  if not path.exists():
+      raise FileNotFoundError(f"Audio file not found.")
+
+  demix_dir = mkpath('./demix')
+  spec_dir = mkpath('./spec')
+
+  # Demix
+  demix_path = demix([path], demix_dir, device)[0]
+
+  # Extract spectrograms
+  spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=False)[0]
+
+  
+  # Run inference
+  with torch.no_grad():
+      result = run_inference(
+          path=path,
+          spec_path=spec_path,
+          model=model,
+          device=device,
+          include_activations=False,
+          include_embeddings=False,
+      )
+
+  # Clean up
+  for stem in ['bass', 'drums', 'other', 'vocals']:
+      (demix_path / f'{stem}.wav').unlink(missing_ok=True)
+  rmdir_if_empty(demix_path)
+  rmdir_if_empty(demix_dir / 'htdemucs')
+  rmdir_if_empty(demix_dir)
+
+  spec_path.unlink(missing_ok=True)
+  rmdir_if_empty(spec_dir)
+
+  return result
+
+
 def analyze(
   paths: Union[PathLike, List[PathLike]],
   out_dir: PathLike = None,
