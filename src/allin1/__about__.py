@@ -1,1 +1,1 @@
-__version__ = "1.1.0_boson"
+__version__ = "1.1.0"
