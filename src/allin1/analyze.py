@@ -1,5 +1,6 @@
 import torch
 import shutil
+import time
 from typing import List, Union
 from tqdm import tqdm
 from pathlib import Path
@@ -34,12 +35,19 @@ def simple_analyze(path, model, device='cuda'):
   spec_dir = mkpath(f'./spec_{base_name}')
 
   # Demix
+  start = time.time()
   demix_path = demix([path], demix_dir, device)[0]
+  demix_time = time.time() - start
+  print(f"[Time] Demix step took {demix_time:.2f} seconds.")
 
   # Extract spectrograms
+  start = time.time()
   spec_path = extract_spectrograms([demix_path], spec_dir, multiprocess=False)[0]
+  spec_time = time.time() - start
+  print(f"[Time] Spectrogram extraction step took {spec_time:.2f} seconds.")
 
   # Run inference
+  start = time.time()
   with torch.no_grad():
       result = run_inference(
           path=path,
@@ -49,6 +57,8 @@ def simple_analyze(path, model, device='cuda'):
           include_activations=False,
           include_embeddings=False,
       )
+  inference_time = time.time() - start
+  print(f"[Time] Inference step took {inference_time:.2f} seconds.")
 
   # Clean up: delete entire demix folder
   if demix_dir.exists():
