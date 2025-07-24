@@ -25,14 +25,14 @@ def simple_load(model='harmonix-all', device='cuda'):
   return model
 
 
-def simple_analyze(path, model, device='cuda'):
+def simple_analyze(path, tmp_dir, model, device='cuda'):
   path = Path(path)
   if not path.exists():
       raise FileNotFoundError("Audio file not found.")
 
   base_name = path.stem
-  demix_dir = mkpath(f'./demix_{base_name}')
-  spec_dir = mkpath(f'./spec_{base_name}')
+  demix_dir = mkpath(f'{tmp_dir}/demix_{base_name}')
+  spec_dir = mkpath(f'{tmp_dir}/spec_{base_name}')
 
   # Demix
   start = time.time()
